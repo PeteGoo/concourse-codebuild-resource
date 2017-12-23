@@ -48,10 +48,11 @@ fi
 
 if [ "$download_artifacts" == "true" ]; then
     mkdir -p "${destination}/artifacts"
-    artifact_location=$(echo $build | jq '.artifacts.location')
+    artifact_location=$(echo $build | jq -r '.artifacts.location')
     if [ -n "$artifact_location" ]; then
-        echo "Syncing artifacts from \"$artifact_location\" to \"${destination}/artifacts\""
-        aws s3 sync "$artifact_location" "${destination}/artifacts"
+        s3_path=$(echo $artifact_location | cut -d : -f 6)
+        echo "Syncing artifacts from \"s3://${s3_path}\" to \"${destination}/artifacts\""
+        aws s3 sync "s3://${s3_path}" "${destination}/artifacts"
     fi
 fi
 
