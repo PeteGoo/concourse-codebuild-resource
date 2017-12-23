@@ -26,6 +26,9 @@ project=$(jq -r '.source.project // ""' < $payload)
 region=$(jq -r '.source.region // ""' < $payload)
 role_arn=$(jq -r '.source.role_arn // ""' < $payload)
 env_var_overrides=$(jq -r '.params.env_var_overrides // []' < $payload)
+source_version=$(jq -r '.params.source_version // []' < $payload)
+source_version_file=$(jq -r '.params.source_version // []' < $payload)
+build_input_file=$(jq -r '.params.build_input_file // []' < $payload)
 
 if [ -z "$region" ]; then
     region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq .region -r)
@@ -38,10 +41,28 @@ if [ -n "$role_arn" ]; then
   assume_role "$role_arn"
 fi
 
-jq -n "{
-    \"projectName\": \"$project\", 
-    \"environmentVariablesOverride\": $env_var_overrides
-}" > /tmp/build_input.json
+if [ -z "$build_input_file" ]; then
+    # Build input has been supplied in a file
+    cp $build_input_file > /tmp/build_input.json
+else
+    # We need to create the build input file
+    build_input=$(jq -n "{
+        \"projectName\": \"$project\", 
+        \"environmentVariablesOverride\": $env_var_overrides
+    }")
+
+    # Get the source version from a file if specified
+    if [ -n "$source_version_file" ]; then
+        source_version=$(cat $source_version_file)
+    fi
+
+    # Add the source version if we have one
+    if [ -n "$source_version" ]; then
+        build_input=$(echo $build_input | jq --arg sourceVersion "$source_version" '. + {sourceVersion: $sourceVersion}')
+    fi
+
+    echo $build_input > /tmp/build_input.json
+fi
 
 echo "Starting to build project $project"
 BUILD_ID=$(aws codebuild start-build --query 'build.id' --output text --region "$region" --cli-input-json file:///tmp/build_input.json)
