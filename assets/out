@@ -32,8 +32,8 @@ fi
 
 echo "$env_var_overrides" > "/tmp/env_var_overrides.json"
 
-echo "Starting the build with args $BUILD_ARGS"
-BUILD_ID=$(aws codebuild start-build $BUILD_ARGS --query 'build.id' --environment-variables-override file:///tmp/env_var_overrides.json --output text)
+echo "Starting to build project $project"
+BUILD_ID=$(aws codebuild start-build --project-name $project --query 'build.id' --environment-variables-override file:///tmp/env_var_overrides.json --output text)
 echo "Started build $BUILD_ID"
 
 # The log group is typically not ready right away
