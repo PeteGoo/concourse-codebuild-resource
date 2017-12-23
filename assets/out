@@ -31,6 +31,9 @@ if [ -z "$region" ]; then
     region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq .region -r)
 fi
 
+export AWS_REGION=$region
+export AWS_DEFAULT_REGION=$region
+
 if [ -n "$role_arn" ]; then
   assume_role "$role_arn"
 fi

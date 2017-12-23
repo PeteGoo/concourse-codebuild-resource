@@ -17,7 +17,15 @@ cat > $payload <&0
 
 project=$(jq -r '.source.project // ""' < $payload)
 role_arn=$(jq -r '.source.role_arn // ""' < $payload)
+region=$(jq -r '.source.region // ""' < $payload)
 ref=$(jq -r '.version.ref // ""' < $payload)
+
+if [ -z "$region" ]; then
+    region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq .region -r)
+fi
+
+export AWS_REGION=$region
+export AWS_DEFAULT_REGION=$region
 
 if [ -z "$ref" ]; then
   ref=NEVERGONNAEXIST
