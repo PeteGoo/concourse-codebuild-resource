@@ -60,7 +60,7 @@ echo "Build job has finished"
 ps -a
 echo "Killing the logging job"
 jobs
-kill $LOG_JOB
+kill -9 $LOG_JOB
 jobs
 ps -a
 
