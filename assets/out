@@ -41,7 +41,7 @@ if [ -n "$role_arn" ]; then
   assume_role "$role_arn"
 fi
 
-if [ -z "$build_input_file" ]; then
+if [ -n "$build_input_file" ]; then
     # Build input has been supplied in a file
     cp $build_input_file > /tmp/build_input.json
 else
