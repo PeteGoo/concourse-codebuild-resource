@@ -56,8 +56,13 @@ LOG_JOB=%1
 
 # Wait for the codebuild to report as anything but IN_PROGRESS
 wait_for_build_to_finish "$BUILD_ID"
-
+echo "Build job has finished"
+ps -a
+echo "Killing the logging job"
+jobs
 kill $LOG_JOB
+jobs
+ps -a
 
 jq -n "{
   version: {
