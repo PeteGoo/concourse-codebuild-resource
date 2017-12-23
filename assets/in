@@ -60,4 +60,4 @@ fi
     set -f
     echo $build
     set +f
-} | jq -s 'map({ref: .id, metadata: [{ name: "source-version", value: .sourceVersion}]})'
+} | jq -s 'map({ref: .id, metadata: [{ name: "source-version", value: .sourceVersion}]})' >&3
