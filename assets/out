@@ -23,8 +23,13 @@ payload=$(mktemp $TMPDIR/codebuild-resource-request.XXXXXX)
 cat > $payload <&0
 
 project=$(jq -r '.source.project // ""' < $payload)
+region=$(jq -r '.source.project // ""' < $payload)
 role_arn=$(jq -r '.source.role_arn // ""' < $payload)
 env_var_overrides=$(jq -r '.params.env_var_overrides // {}' < $payload)
+
+if [ -z "$region" ]; then
+    region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq .region -r)
+fi
 
 if [ -n "$role_arn" ]; then
   assume_role "$role_arn"
@@ -36,7 +41,7 @@ jq -n "{
 }" > /tmp/build_input.json
 
 echo "Starting to build project $project"
-BUILD_ID=$(aws codebuild start-build --query 'build.id' --output text --cli-input-json file:///tmp/build_input.json)
+BUILD_ID=$(aws codebuild start-build --query 'build.id' --output text --region "$region" --cli-input-json file:///tmp/build_input.json)
 echo "Started build $BUILD_ID"
 
 # The log group is typically not ready right away
