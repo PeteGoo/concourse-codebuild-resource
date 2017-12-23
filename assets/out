@@ -25,7 +25,7 @@ cat > $payload <&0
 project=$(jq -r '.source.project // ""' < $payload)
 region=$(jq -r '.source.region // ""' < $payload)
 role_arn=$(jq -r '.source.role_arn // ""' < $payload)
-env_var_overrides=$(jq -r '.params.env_var_overrides // {}' < $payload)
+env_var_overrides=$(jq -r '.params.env_var_overrides // []' < $payload)
 
 if [ -z "$region" ]; then
     region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq .region -r)
