@@ -58,6 +58,6 @@ fi
 
 {
     set -f
-    echo $BUILD
+    echo $build
     set +f
 } | jq -s 'map({ref: .id, metadata: [{ name: "source-version", value: .sourceVersion}]})'
