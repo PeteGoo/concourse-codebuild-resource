@@ -58,9 +58,10 @@ LOG_PID=$!
 wait_for_build_to_finish "$BUILD_ID"
 echo "Build job has finished"
 ps -a
-echo "Killing the logging job"
+echo "Killing the logging job $LOG_PID"
 jobs
 kill -9 $LOG_PID
+killall awslogs
 jobs
 ps -a
 
