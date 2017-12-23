@@ -1,0 +1,58 @@
+#!/bin/bash
+# vim: set ft=sh
+
+set -e
+
+exec 3>&1 # make stdout available as fd 3 for the result
+exec 1>&2 # redirect all output to stderr for logging
+
+source $(dirname $0)/common.sh
+
+sources=$1
+
+if [ -z "$sources" ]; then
+  echo "usage: $0 <path/to/sources>" >&2
+  exit 1
+fi
+
+# for jq
+PATH=/usr/local/bin:$PATH
+
+payload=$(mktemp $TMPDIR/codebuild-resource-request.XXXXXX)
+
+cat > $payload <&0
+
+project=$(jq -r '.source.project // ""' < $payload)
+role_arn=$(jq -r '.source.role_arn // ""' < $payload)
+env_var_overrides=$(jq -r '.params.env_var_overrides // {}' < $payload)
+
+if [ -n "$role_arn" ]; then
+  assume_role "$role_arn"
+fi
+
+echo "$env_var_overrides" > "/tmp/env_var_overrides.json"
+
+echo "Starting the build with args $BUILD_ARGS"
+BUILD_ID=$(aws codebuild start-build $BUILD_ARGS --query 'build.id' --environment-variables-override file:///tmp/env_var_overrides.json --output text)
+echo "Started build $BUILD_ID"
+
+# The log group is typically not ready right away
+sleep 2
+
+# Kick off the log streaming in the background
+watch_build_logs "$BUILD_ID" &
+LOG_JOB=%1
+
+# Wait for the codebuild to report as anything but IN_PROGRESS
+wait_for_build_to_finish "$BUILD_ID"
+
+kill $LOG_JOB
+
+jq -n "{
+  version: {
+    ref: $(echo $BUILD_ID | jq -R .)
+  },
+  metadata: [
+    { name: \"project\", value: \"$project\" }
+  ]
+}" >&3

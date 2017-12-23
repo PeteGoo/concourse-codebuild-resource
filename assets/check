@@ -23,6 +23,10 @@ if [ -z "$ref" ]; then
   ref=NEVERGONNAEXIST
 fi
 
+if [ -n "$role_arn" ]; then
+  assume_role "$role_arn"
+fi
+
 {
     set -f
     aws codebuild list-builds-for-project --project-name "$project" --query 'ids[*]'
