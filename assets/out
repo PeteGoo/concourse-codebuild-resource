@@ -23,7 +23,7 @@ payload=$(mktemp $TMPDIR/codebuild-resource-request.XXXXXX)
 cat > $payload <&0
 
 project=$(jq -r '.source.project // ""' < $payload)
-region=$(jq -r '.source.project // ""' < $payload)
+region=$(jq -r '.source.region // ""' < $payload)
 role_arn=$(jq -r '.source.role_arn // ""' < $payload)
 env_var_overrides=$(jq -r '.params.env_var_overrides // {}' < $payload)
 
