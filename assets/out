@@ -52,7 +52,7 @@ sleep 2
 
 # Kick off the log streaming in the background
 watch_build_logs "$BUILD_ID" &
-LOG_JOB=%1
+LOG_PID=$!
 
 # Wait for the codebuild to report as anything but IN_PROGRESS
 wait_for_build_to_finish "$BUILD_ID"
@@ -60,7 +60,7 @@ echo "Build job has finished"
 ps -a
 echo "Killing the logging job"
 jobs
-kill -9 $LOG_JOB
+kill -9 $LOG_PID
 jobs
 ps -a
 
