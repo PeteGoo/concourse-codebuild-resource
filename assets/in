@@ -40,7 +40,7 @@ if [ -n "$role_arn" ]; then
   assume_role "$role_arn"
 fi
 
-build=$(aws codebuild batch-get-builds --ids "$build_id" | jq '.builds[0]')
+build=$(aws codebuild batch-get-builds --ids "$build_id" --query 'builds[0]')
 
 if [ "$build" == null ]; then
     echo "The build ${build_id} could not be found"
@@ -56,8 +56,5 @@ if [ "$download_artifacts" == "true" ]; then
     fi
 fi
 
-{
-    set -f
-    echo $build
-    set +f
-} | jq -s 'map({ version: { ref: .id }, metadata: [{ name: "source-version", value: .sourceVersion}]})' >&3
+aws codebuild batch-get-builds --ids "$build_id" --query 'builds[0]' \
+  | jq -s 'map({ version: { ref: .id }, metadata: [{ name: "source-version", value: .sourceVersion}]})' >&3
