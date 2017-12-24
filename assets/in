@@ -57,4 +57,4 @@ if [ "$download_artifacts" == "true" ]; then
 fi
 
 aws codebuild batch-get-builds --ids "$build_id" --query 'builds[0]' \
-  | jq -s 'map({ version: { ref: .id }, metadata: [{ name: "source-version", value: .sourceVersion}]})' >&3
+  | jq -s 'map({ version: { ref: .id }, metadata: []})' >&3
