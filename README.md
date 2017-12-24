@@ -1,4 +1,7 @@
 # AWS Codebuild Resource
+
+[![Docker Build Status](https://img.shields.io/docker/build/petegoo/concourse-codebuild-resource.svg)](https://hub.docker.com/r/petegoo/concourse-codebuild-resource)
+
 Allows Concourse to interact with [AWS Codebuild](https://aws.amazon.com/codebuild/) projects
 
 - *check:* Respond to new builds completed in Codebuild
