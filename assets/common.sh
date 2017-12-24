@@ -39,5 +39,5 @@ watch_build_logs() {
     LOG_STREAM=$(aws codebuild batch-get-builds --ids $BUILD_ID_TO_LOG --query 'builds[*].logs.streamName' --output text)
     echo "log group for $BUILD_ID_TO_LOG is $LOG_GROUP,  Stream: $LOG_STREAM"
 
-    awslogs get $LOG_GROUP $LOG_STREAM --watch | sed '/Phase complete: POST_BUILD/ q'
+    awslogs get $LOG_GROUP $LOG_STREAM --watch --no-group --no-stream | sed '/Phase complete: POST_BUILD/ q'
 }
