@@ -25,7 +25,7 @@ cat > $payload <&0
 project=$(jq -r '.source.project // ""' < $payload)
 role_arn=$(jq -r '.source.role_arn // ""' < $payload)
 region=$(jq -r '.source.region // ""' < $payload)
-ref=$(jq -r '.version.ref // "HEAD"' < $payload)
+build_id=$(jq -r '.version.ref // "HEAD"' < $payload)
 
 download_artifacts=$(jq -r '(.params.submodules // "true")' < $payload)
 
@@ -40,10 +40,10 @@ if [ -n "$role_arn" ]; then
   assume_role "$role_arn"
 fi
 
-build=$(aws codebuild batch-get-builds --ids "$ref" | jq '.builds[0]')
+build=$(aws codebuild batch-get-builds --ids "$build_id" | jq '.builds[0]')
 
 if [ "$build" == null ]; then
-    echo "The build ${ref} could not be found"
+    echo "The build ${build_id} could not be found"
 fi
 
 if [ "$download_artifacts" == "true" ]; then
