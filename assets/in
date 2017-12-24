@@ -57,6 +57,6 @@ if [ "$download_artifacts" == "true" ]; then
 fi
 
 output=$(aws codebuild batch-get-builds --ids "$build_id" --query 'builds[0]' \
-  | jq -r '{ version: { ref: .id }, metadata: []})'
+  | jq -r '{ version: { ref: .id }, metadata: []}')
 echo $output
 echo $output >&3
