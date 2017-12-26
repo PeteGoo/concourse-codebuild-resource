@@ -75,6 +75,23 @@ resource_types:
     tag: latest
 ```
 
+##### Overriding Environment Variables
+
+You can override specific environment variables by including them in your
+build `params`.
+
+```
+jobs:
+
+- name: build-my-project
+  plan:
+  - put: my-project-codebuild
+    params:
+      env_var_overrides:
+        FOO: foo
+        BAR: bar
+```
+
 ### `in`: Get the output artifacts from a completed Codebuild build
 
 Fetch the build details and artifacts from a completed Codebuild build.
