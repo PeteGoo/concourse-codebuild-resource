@@ -84,6 +84,14 @@ echo "Killing the logging job with PID $LOG_PID"
 kill -9 $LOG_PID
 killall awslogs
 
+BUILD_STATUS=$(aws codebuild batch-get-builds --ids $BUILD_ID --output text --region "$region" --query 'builds[0].buildStatus' --output text)
+
+if [ $BUILD_STATUS != 'SUCCEEDED' ]
+then
+	echo "The build did not complete successfully" >&2
+	exit 1
+fi
+
 jq -n "{
   version: {
     ref: $(echo $BUILD_ID | jq -R .)
