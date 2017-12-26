@@ -18,5 +18,4 @@ RUN apk --no-cache add \
 RUN pip3 install --upgrade awscli awslogs
 
 ADD assets/ /opt/resource/
-ADD scripts/ /opt/resource/
 RUN chmod +x /opt/resource/*
