@@ -46,7 +46,7 @@ if [ -n "$build_input_file" ]; then
     cp $build_input_file > /tmp/build_input.json
 else
     if [ "$env_var_overrides" != "[]" ]; then
-        env_var_overides=$(echo "$env_var_overrides" | jq -s '.[] | to_entries | map( {name: .key, value: .value, type: "PLAINTEXT"})')
+        env_var_overrides=$(echo "$env_var_overrides" | jq -s '.[] | to_entries | map( {name: .key, value: .value, type: "PLAINTEXT"})')
     fi
 
     # We need to create the build input file
