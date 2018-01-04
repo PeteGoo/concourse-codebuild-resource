@@ -46,6 +46,17 @@ if [ -n "$build_input_file" ]; then
     cp $build_input_file > /tmp/build_input.json
 else
     if [ "$env_var_overrides" != "[]" ]; then
+        # Look to see if the values of any overrides are file paths and set the contents to that
+        for key in $(echo $env_var_overrides | jq -r 'to_entries | .[].key'); do
+            value=$(echo $env_var_overrides | jq -r --arg key "$key" '.[$key]' )
+            echo "The value is $value"
+            if [ -f "$value" ]; then 
+                echo "Setting content of environment variable $key to the contents of the file $value"
+                file_contents=$(cat "$value")
+                env_var_overrides=$(echo $env_var_overrides | jq --arg key "$key" --arg value "$file_contents" '.[$key] = $value')
+            fi    
+        done
+
         env_var_overrides=$(echo "$env_var_overrides" | jq -s '.[] | to_entries | map( {name: .key, value: .value, type: "PLAINTEXT"})')
     fi
 
