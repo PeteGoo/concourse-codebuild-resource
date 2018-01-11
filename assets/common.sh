@@ -3,7 +3,7 @@ export TMPDIR=${TMPDIR:-/tmp}
 
 assume_role() {
     role=$1
-    assumed_role_details=$(aws-vault exec mgmt -- aws sts assume-role --role-arn "$1" --role-session-name concourse)
+    assumed_role_details=$(aws sts assume-role --role-arn "$1" --role-session-name concourse)
     access_key_id=$(echo $assumed_role_details | jq -s '.AccessKeyId')
     secret_access_key=$(echo $assumed_role_details | jq -s '.SecretAccessKey')
     session_token=$(echo $assumed_role_details | jq -s '.SessionToken')
