@@ -50,9 +50,9 @@ else
         for key in $(echo $env_var_overrides | jq -r 'to_entries | .[].key'); do
             value=$(echo $env_var_overrides | jq -r --arg key "$key" '.[$key]' )
             echo "The value is $value"
-            if [ -f "$value" ]; then 
+            if [ -f "${sources}/${value}" ]; then
                 echo "Setting content of environment variable $key to the contents of the file $value"
-                file_contents=$(cat "$value")
+                file_contents=$(cat "${sources}/${value}")
                 env_var_overrides=$(echo $env_var_overrides | jq --arg key "$key" --arg value "$file_contents" '.[$key] = $value')
             fi    
         done
