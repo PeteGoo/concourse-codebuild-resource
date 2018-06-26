@@ -37,6 +37,6 @@ fi
 
 {
     set -f
-    aws codebuild list-builds-for-project --project-name "$project" --query 'ids[*]' --format json
+    aws codebuild list-builds-for-project --project-name "$project" --query 'ids[*]' --output json
     set +f
 } | jq ".[]" | sed "/$ref/ q" | tail -r | jq -s "map({ref: .})"
