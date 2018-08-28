@@ -1,4 +1,4 @@
-FROM alpine:edge AS resource
+FROM alpine:3.7 AS resource
 
 RUN apk --no-cache add \
   bash \
