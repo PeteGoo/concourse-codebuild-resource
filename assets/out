@@ -106,8 +106,8 @@ echo "Build job has finished"
 
 echo "Killing the logging job with PID $LOG_PID"
 
-kill -9 $LOG_PID
-killall awslogs
+kill -9 $LOG_PID;
+killall awslogs;
 
 BUILD_STATUS=$(aws codebuild batch-get-builds --ids $BUILD_ID --output text --region "$region" --query 'builds[0].buildStatus' --output text)
 
