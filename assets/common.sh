@@ -32,12 +32,15 @@ wait_for_build_to_finish() {
 }
 
 watch_build_logs() {
-
     BUILD_ID_TO_LOG=$1
     echo "fetching log group for $BUILD_ID_TO_LOG"
     LOG_GROUP=$(aws codebuild batch-get-builds --ids $BUILD_ID_TO_LOG --query 'builds[*].logs.cloudWatchLogs.groupName' --output text)
     LOG_STREAM=$(aws codebuild batch-get-builds --ids $BUILD_ID_TO_LOG --query 'builds[*].logs.cloudWatchLogs.streamName' --output text)
-    echo "log group for $BUILD_ID_TO_LOG is $LOG_GROUP,  Stream: $LOG_STREAM"
 
-    awslogs get $LOG_GROUP $LOG_STREAM --watch --no-group --no-stream | sed '/Phase complete: POST_BUILD/ q'
+    streamId=$(echo $BUILD_ID_TO_LOG | cut -d ":" -f 2)
+    LOG_STREAM_FULL="$LOG_STREAM/$streamId"
+
+    echo "log group for $BUILD_ID_TO_LOG is $LOG_GROUP,  Stream: $LOG_STREAM_FULL"
+
+    awslogs get $LOG_GROUP $LOG_STREAM_FULL --watch --no-group --no-stream | sed '/Phase complete: POST_BUILD/ q'
 }
