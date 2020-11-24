@@ -31,6 +31,28 @@ wait_for_build_to_finish() {
     done
 }
 
+wait_for_log_stream() {
+    WAIT_FOR_BUILD_ID=$1
+    NOT_ACCEPTABLE_PHASES=("SUBMITTED" "QUEUED" "PROVISIONING" "DOWNLOAD_SOURCE")
+
+    echo "Waiting for the build $WAIT_FOR_BUILD_ID to enter a suitable phase for streaming the logs."
+
+    while :
+    do
+
+    BUILD_STATUS=$(aws codebuild batch-get-builds --ids $WAIT_FOR_BUILD_ID --query 'builds[*].buildStatus' --output text)
+
+    if [[ ! " ${NOT_ACCEPTABLE_PHASES[@]} " =~ " ${BUILD_STATUS} " ]]; then
+        echo "Log stream is available."
+        break
+    fi
+
+    echo "."
+
+    sleep 5
+    done
+}
+
 watch_build_logs() {
     BUILD_ID_TO_LOG=$1
     echo "fetching log group for $BUILD_ID_TO_LOG"
