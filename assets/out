@@ -25,13 +25,23 @@ cat > $payload <&0
 project=$(jq -r '.source.project // ""' < $payload)
 region=$(jq -r '.source.region // ""' < $payload)
 role_arn=$(jq -r '.source.role_arn // ""' < $payload)
+access_key_id=$(jq -r '.source.access_key_id // ""' < $payload)
+secret_access_key=$(jq -r '.source.secret_access_key // ""' < $payload)
 env_var_overrides=$(jq -r '.params.env_var_overrides // []' < $payload)
 source_version=$(jq -r '.params.source_version // ""' < $payload)
 source_version_file=$(jq -r '.params.source_version_file // ""' < $payload)
 build_input_file=$(jq -r '.params.build_input_file // ""' < $payload)
 
 if [ -z "$region" ]; then
-    region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq .region -r)
+  region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq .region -r)
+fi
+
+if [ -n "$access_key_id" ]; then
+  export AWS_ACCESS_KEY_ID=$access_key_id
+fi
+
+if [ -n "$secret_access_key" ]; then
+  export AWS_SECRET_ACCESS_KEY=$secret_access_key
 fi
 
 export AWS_REGION=$region
@@ -54,7 +64,7 @@ else
                 echo "Setting content of environment variable $key to the contents of the file $value"
                 file_contents=$(cat "${sources}/${value}")
                 env_var_overrides=$(echo $env_var_overrides | jq --arg key "$key" --arg value "$file_contents" '.[$key] = $value')
-            fi    
+            fi
         done
 
         env_var_overrides=$(echo "$env_var_overrides" | jq -s '.[] | to_entries | map( {name: .key, value: .value, type: "PLAINTEXT"})')
@@ -62,7 +72,7 @@ else
 
     # We need to create the build input file
     build_input=$(jq -n "{
-        \"projectName\": \"$project\", 
+        \"projectName\": \"$project\",
         \"environmentVariablesOverride\": $env_var_overrides
     }")
 
