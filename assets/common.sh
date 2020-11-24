@@ -40,10 +40,10 @@ wait_for_log_stream() {
     while :
     do
 
-    BUILD_STATUS=$(aws codebuild batch-get-builds --ids $WAIT_FOR_BUILD_ID --query 'builds[*].buildStatus' --output text)
+    BUILD_PHASE=$(aws codebuild batch-get-builds --ids $WAIT_FOR_BUILD_ID --query 'builds[*].currentPhase' --output text)
 
-    if [[ ! " ${NOT_ACCEPTABLE_PHASES[@]} " =~ " ${BUILD_STATUS} " ]]; then
-        echo "Phase is $BUILD_STATUS. Log stream should be available."
+    if [[ ! " ${NOT_ACCEPTABLE_PHASES[@]} " =~ " ${BUILD_PHASE} " ]]; then
+        echo "Phase is $BUILD_PHASE. Log stream should be available."
         break
     fi
 
