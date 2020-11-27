@@ -18,10 +18,20 @@ cat > $payload <&0
 project=$(jq -r '.source.project // ""' < $payload)
 role_arn=$(jq -r '.source.role_arn // ""' < $payload)
 region=$(jq -r '.source.region // ""' < $payload)
+access_key_id=$(jq -r '.source.access_key_id // ""' < $payload)
+secret_access_key=$(jq -r '.source.secret_access_key // ""' < $payload)
 ref=$(jq -r '.version.ref // ""' < $payload)
 
 if [ -z "$region" ]; then
-    region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq .region -r)
+  region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq .region -r)
+fi
+
+if [ -n "$access_key_id" ]; then
+  export AWS_ACCESS_KEY_ID=$access_key_id
+fi
+
+if [ -n "$secret_access_key" ]; then
+  export AWS_SECRET_ACCESS_KEY=$secret_access_key
 fi
 
 export AWS_REGION=$region
@@ -39,4 +49,4 @@ fi
     set -f
     aws codebuild list-builds-for-project --project-name "$project" --query 'ids[*]' --output json
     set +f
-} | jq ".[]" | sed "/$ref/ q" | tail -r | jq -s "map({ref: .})"
+} | jq ".[]" | sed "/$ref/ q" | tail -r | jq -s "map({ref: .})" >&3

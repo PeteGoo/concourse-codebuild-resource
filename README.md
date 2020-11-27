@@ -25,6 +25,8 @@ Make sure you have a Codebuild project already setup.
 - `project`: _Required._ The name of the codebuild project
 - `region`: _Optional_. The region the Codebuild project resides in. Defaults to the value in the worker instance metadata.
 - `role_arn`: _Optional._ The role to assume before calling the command to start aws codebuild. This is not the role that Codebuild will use when it runs. Allows cross account access to Codebuild.
+- `access_key_id`: _Optional._ The access key id to use for configuring the aws cli.
+- `secret_access_key`: _Optional._ The secret access key to use for configuring the aws cli.
 
 ```
 resources:
